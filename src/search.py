@@ -35,7 +35,7 @@ def keyword_search_result(statement, model, prompt_template):
         if kw:
             return kw[0]
 
-    return keywords.content
+    return content
 
 
 def get_urls(keywords):
