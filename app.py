@@ -11,7 +11,7 @@ import gradio as gr
 
 def fact_checking_pipeline(claim):
 
-    model = "openai"
+    model = "gemini-pro"
     keyword_template = "cot"
 
     # 1. Internet document retrieval:
