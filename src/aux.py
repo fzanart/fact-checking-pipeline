@@ -68,7 +68,12 @@ def clean_and_match(data):
     matches = {}
     for key, value in data.items():
         # Clean the string
-        cleaned_value = clean_pattern.sub("", value.content)
+        try:
+            content = value.content
+        except AttributeError:
+            content = value
+
+        cleaned_value = clean_pattern.sub("", content)
         # Match the stance
         match = stance_pattern.search(cleaned_value)
         if match:
