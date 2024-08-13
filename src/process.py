@@ -46,6 +46,8 @@ def merge_answer(model, evidence_docs, labels, claim):
         str(k): evidence_docs[k] for k, idx in zip(relevant_keys, evidence_docs)
     }
 
+    logging.info(f"evidence = {evidence}")
+
     if not evidence:
 
         return "No refuting evidence has been found"

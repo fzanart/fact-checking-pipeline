@@ -1,3 +1,4 @@
+import logging
 from src.search import keyword_search_result, get_urls
 from src.retrieve import (
     fetch_url_and_parse_html,
@@ -8,14 +9,17 @@ from src.process import stance_detection, merge_answer
 from src.aux import clean_and_match
 import gradio as gr
 
+logging.basicConfig(format="%(message)s", level=logging.INFO)
+
 
 def fact_checking_pipeline(claim):
 
     model = "gemini-pro"
     keyword_template = "cot"
-
+    logging.info(f"claim = {claim}")
     # 1. Internet document retrieval:
     keywords = keyword_search_result(claim, model, keyword_template)
+    logging.info(f"keywords = {keywords}")
     urls = get_urls(keywords)
     html = fetch_url_and_parse_html(urls)
     chunked_docs = split_into_chunked_docs(html)
