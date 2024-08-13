@@ -38,8 +38,8 @@ def fact_checking_pipeline(claim):
         except AttributeError:
             content = answer[0]
 
-        return f"answer: {content}\nsource: {answer[1]}"
-    return answer
+        return str({"answer": content, "keywords": keywords, "source": answer[1]})
+    return str({"answer": answer, "keywords": keywords, "source": "NA"})
 
 
 demo = gr.Interface(fn=fact_checking_pipeline, inputs="text", outputs="text")
