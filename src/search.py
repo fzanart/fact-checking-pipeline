@@ -25,7 +25,13 @@ def keyword_search_result(statement, model, prompt_template):
     keywords = chain.invoke({"statement": statement})
 
     if prompt_template == "cot":
-        kw = re.findall(r"(?<=The keyword search could be:\s).*", keywords.content)
+
+        try:
+            content = keywords.content
+        except AttributeError:
+            content = keywords
+
+        kw = re.findall(r"(?<=The keyword search could be:\s).*", content)
         if kw:
             return kw[0]
 
