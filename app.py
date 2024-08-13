@@ -26,8 +26,15 @@ def fact_checking_pipeline(claim):
     lbls = clean_and_match(labels)
     # 4. Claim Validation:
     answer = merge_answer(model, evidence_docs, lbls, claim)
+
     if isinstance(answer, tuple):
-        return f"answer: {answer[0].content}\nsource: {answer[1]}"
+
+        try:
+            content = answer[0].content
+        except AttributeError:
+            content = answer[0]
+
+        return f"answer: {content}\nsource: {answer[1]}"
     return answer
 
 
