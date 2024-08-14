@@ -14,7 +14,7 @@ logging.basicConfig(format="%(message)s", level=logging.INFO)
 
 def fact_checking_pipeline(claim):
 
-    model = "gemini-pro"
+    model = "openai"
     keyword_template = "cot"
     logging.info(f"claim = {claim}")
     # 1. Internet document retrieval:

@@ -14,7 +14,7 @@ MODEL_CONFIG = {
         temperature=0,
         openai_api_key=os.environ.get("OPENAI_API_KEY"),
         openai_organization=os.environ.get("OPENAI_ORGANIZATION_ID"),
-        model_name="gpt-4-0125-preview",
+        model_name="gpt-4o-2024-05-13",
     ),
     "mixtral": HuggingFaceEndpoint(
         repo_id="mistralai/Mixtral-8x7B-Instruct-v0.1",
