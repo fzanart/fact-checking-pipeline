@@ -20,25 +20,29 @@ pipe = pipeline(
 
 
 def process_evidence(claim, evidence):
-    max_length = 510
+    max_length = 500
 
     # Tokenize claim and evidence separately
     claim_tokens = tokenizer.tokenize(claim)
     evidence_tokens = tokenizer.tokenize(evidence)
+    print(len(claim_tokens) + len(evidence_tokens))
 
     # Determine the split between claim and evidence
     half_tokens = max_length // 2
 
     if len(claim_tokens) + len(evidence_tokens) > max_length:
+
         # If they exceed the limit, truncate them proportionally
         claim_tokens = claim_tokens[:half_tokens]
-        evidence_tokens = evidence_tokens[: available_tokens - len(claim_tokens)]
+        evidence_tokens = evidence_tokens[: max_length - len(claim_tokens)]
 
     # Reconstruct the input text
     truncated_claim = tokenizer.convert_tokens_to_string(claim_tokens)
     truncated_evidence = tokenizer.convert_tokens_to_string(evidence_tokens)
 
     input_text = f"{truncated_claim} [SEP] {truncated_evidence}"
+
+    print(input_text)
 
     result = pipe(input_text)
 
