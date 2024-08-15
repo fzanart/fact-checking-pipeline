@@ -45,7 +45,7 @@ def parse_html(document):
 
 
 # Split
-def split_into_chunked_docs(documents, chunk_size=1024):
+def split_into_chunked_docs(documents, chunk_size=512):
     if not isinstance(documents, list):
         documents = [documents]
 
