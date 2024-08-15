@@ -26,7 +26,7 @@ def fact_checking_pipeline(claim):
     # 2. Evidence Extraction:
     evidence_docs = retrieve_docs(chunked_docs, keywords)
     # 3. Stance Detection:
-    labels = stance_detection(model, evidence_docs, claim)
+    labels = stance_detection(evidence_docs, claim)
     lbls = clean_and_match(labels)
     # 4. Claim Validation:
     answer = merge_answer(model, evidence_docs, lbls, claim)
