@@ -1,3 +1,6 @@
+import os
+
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 import logging
 from .aux import parser, get_llm, clean_and_match
 from .prompts import stance_detection_template, template_merge
@@ -7,16 +10,49 @@ from langchain_core.runnables import RunnableParallel
 logging.basicConfig(format="%(message)s", level=logging.INFO)
 
 
-from transformers import pipeline
+from transformers import AutoTokenizer, pipeline
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-# Load the pipeline once, outside of the functions
-pipe = pipeline("text-classification", model="fzanartu/climate-fact-checker")
+tokenizer = AutoTokenizer.from_pretrained("fzanartu/climate-fact-checker")
+pipe = pipeline(
+    "text-classification", model="fzanartu/climate-fact-checker", tokenizer=tokenizer
+)
 
 
 def process_evidence(claim, evidence):
-    input_text = f"{claim} [SEP] {evidence}"
-    result = pipe(input_text)
+    max_length = 512
+    sep_token = tokenizer.sep_token
+    logging.info(f"sep_token = {sep_token}")
+    # Tokenize claim and evidence separately
+    claim_tokens = tokenizer.tokenize(claim)
+    evidence_tokens = tokenizer.tokenize(evidence)
+
+    # Ensure space for the [SEP] token
+    sep_token_length = len(tokenizer.tokenize(sep_token))
+    logging.info(f"sep_token_length = {sep_token_length}")
+    # Calculate available tokens for claim and evidence
+    available_tokens = max_length - sep_token_length
+
+    # Determine the split between claim and evidence
+    half_tokens = available_tokens // 2
+
+    if len(claim_tokens) + len(evidence_tokens) > available_tokens:
+        # If they exceed the limit, truncate them proportionally
+        claim_tokens = claim_tokens[:half_tokens]
+        evidence_tokens = evidence_tokens[: available_tokens - len(claim_tokens)]
+
+    # Reconstruct the input text
+    truncated_claim = tokenizer.convert_tokens_to_string(claim_tokens)
+    truncated_evidence = tokenizer.convert_tokens_to_string(evidence_tokens)
+    input_text = f"{truncated_claim} {sep_token} {truncated_evidence}"
+
+    # Tokenize the final text
+    tokens = tokenizer(
+        input_text, truncation=True, max_length=max_length, return_tensors="pt"
+    )
+    truncated_text = tokenizer.decode(tokens["input_ids"][0])
+
+    result = pipe(truncated_text)
 
     # The pipeline usually returns a list of dicts, we take the first one
     return result[0]["label"]
