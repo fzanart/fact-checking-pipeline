@@ -7,34 +7,39 @@ from langchain_core.runnables import RunnableParallel
 logging.basicConfig(format="%(message)s", level=logging.INFO)
 
 
-def stance_detection(model, evidence_docs, claim):
+from transformers import pipeline
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
-    llm = get_llm(model)
-
-    chains_dict = {}
-    for i, chunk in enumerate(evidence_docs):
-        prompt = PromptTemplate(
-            template=stance_detection_template,
-            input_variables=["claim"],
-            partial_variables={
-                "evidence": chunk,
-                "format_instructions": parser.get_format_instructions(),
-            },
-        )
-
-        # Dynamically name the chains based on their index
-        chain_name = str(i)
-        chains_dict[chain_name] = prompt | llm
-
-    map_chain = RunnableParallel(**chains_dict)
-    labels = map_chain.invoke({"claim": claim})
-    # labels = clean_and_match(labels)
-
-    return labels
+# Load the pipeline once, outside of the functions
+pipe = pipeline("text-classification", model="fzanartu/climate-fact-checker")
 
 
-# if len(labels) > 1 : merge_prompt
-# TODO: move refute label filter outside merge answer?
+def process_evidence(claim, evidence):
+    input_text = f"{claim} [SEP] {evidence}"
+    result = pipe(input_text)
+
+    # The pipeline usually returns a list of dicts, we take the first one
+    return result[0]["label"]
+
+
+def stance_detection(evidence_docs, claim):
+    results = {}
+
+    with ThreadPoolExecutor() as executor:
+        future_to_evidence = {
+            executor.submit(process_evidence, claim, evidence): i
+            for i, evidence in enumerate(evidence_docs)
+        }
+
+        for future in as_completed(future_to_evidence):
+            evidence_index = future_to_evidence[future]
+            try:
+                stance = future.result()
+                results[str(evidence_index)] = stance
+            except Exception as exc:
+                print(f"Evidence {evidence_index} generated an exception: {exc}")
+
+    return results
 
 
 def merge_answer(model, evidence_docs, labels, claim):

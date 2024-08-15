@@ -9,3 +9,4 @@ duckduckgo-search==6.1.12
 langchain_huggingface==0.0.3
 playwright==1.45.0
 gradio==4.37.2
+transformers==4.44.0
