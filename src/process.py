@@ -52,7 +52,7 @@ def stance_detection(evidence_docs, claim):
 
     for i, evidence in enumerate(evidence_docs):
 
-        stance = process_evidence(claim, evidence)
+        stance = process_evidence(claim, evidence.page_content)
         logging.info(f"evidence {i}, label: {stance}")
         results[str(i)] = stance
 
