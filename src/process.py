@@ -50,19 +50,13 @@ def process_evidence(claim, evidence):
 def stance_detection(evidence_docs, claim):
     results = {}
 
-    with ThreadPoolExecutor() as executor:
-        future_to_evidence = {
-            executor.submit(process_evidence, claim, evidence): i
-            for i, evidence in enumerate(evidence_docs)
-        }
-
-        for future in as_completed(future_to_evidence):
-            evidence_index = future_to_evidence[future]
-            try:
-                stance = future.result()
-                results[str(evidence_index)] = stance
-            except Exception as exc:
-                print(f"Evidence {evidence_index} generated an exception: {exc}")
+    for i, evidence in enumerate(evidence_docs):
+        try:
+            stance, score = process_evidence(claim, evidence)
+            logging.info(f"evidence {i}, label: {stance}, score:{score:.2f}")
+            results[str(i)] = {"stance": stance, "confidence": score}
+        except Exception as exc:
+            print(f"Evidence {i} generated an exception: {exc}")
 
     return results
 
