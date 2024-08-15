@@ -25,6 +25,7 @@ def fact_checking_pipeline(claim):
     chunked_docs = split_into_chunked_docs(html)
     # 2. Evidence Extraction:
     evidence_docs = retrieve_docs(chunked_docs, keywords)
+    logging.info(f"evidence: {evidence_docs}")
     # 3. Stance Detection:
     labels = stance_detection(evidence_docs, claim)
     lbls = clean_and_match(labels)
