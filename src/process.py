@@ -25,7 +25,6 @@ def process_evidence(claim, evidence):
     # Tokenize claim and evidence separately
     claim_tokens = tokenizer.tokenize(claim)
     evidence_tokens = tokenizer.tokenize(evidence)
-    print(len(claim_tokens) + len(evidence_tokens))
 
     # Determine the split between claim and evidence
     half_tokens = max_length // 2
@@ -41,8 +40,6 @@ def process_evidence(claim, evidence):
     truncated_evidence = tokenizer.convert_tokens_to_string(evidence_tokens)
 
     input_text = f"{truncated_claim} [SEP] {truncated_evidence}"
-
-    print(input_text)
 
     result = pipe(input_text)
 
