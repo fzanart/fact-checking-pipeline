@@ -51,12 +51,10 @@ def stance_detection(evidence_docs, claim):
     results = {}
 
     for i, evidence in enumerate(evidence_docs):
-        try:
-            stance, score = process_evidence(claim, evidence)
-            logging.info(f"evidence {i}, label: {stance}, score:{score:.2f}")
-            results[str(i)] = {"stance": stance, "confidence": score}
-        except Exception as exc:
-            print(f"Evidence {i} generated an exception: {exc}")
+
+        stance = process_evidence(claim, evidence)
+        logging.info(f"evidence {i}, label: {stance}")
+        results[str(i)] = stance
 
     return results
 
