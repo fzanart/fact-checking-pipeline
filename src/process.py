@@ -1,62 +1,34 @@
 import os
-
-os.environ["TOKENIZERS_PARALLELISM"] = "false"
 import logging
-from .aux import parser, get_llm, clean_and_match
-from .prompts import stance_detection_template, template_merge
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnableParallel
+from .aux import parser, get_llm, clean_and_match
+from .prompts import stance_detection_template, template_merge
 
 logging.basicConfig(format="%(message)s", level=logging.INFO)
 
 
-from transformers import AutoTokenizer, pipeline
-from concurrent.futures import ThreadPoolExecutor, as_completed
+def stance_detection(model, evidence_docs, claim):
 
-tokenizer = AutoTokenizer.from_pretrained("fzanartu/climate-fact-checker")
-pipe = pipeline(
-    "text-classification", model="fzanartu/climate-fact-checker", tokenizer=tokenizer
-)
+    llm = get_llm(model)
+    chains_dict = {}
+    for i, chunk in enumerate(evidence_docs):
+        prompt = PromptTemplate(
+            template=stance_detection_template,
+            input_variables=["claim"],
+            partial_variables={
+                "evidence": chunk,
+                "format_instructions": parser.get_format_instructions(),
+            },
+        )
+        # Dynamically name the chains based on their index
+        chain_name = str(i)
+        chains_dict[chain_name] = prompt | llm
 
-
-def process_evidence(claim, evidence):
-    max_length = 500
-
-    # Tokenize claim and evidence separately
-    claim_tokens = tokenizer.tokenize(claim)
-    evidence_tokens = tokenizer.tokenize(evidence)
-
-    # Determine the split between claim and evidence
-    half_tokens = max_length // 2
-
-    if len(claim_tokens) + len(evidence_tokens) > max_length:
-
-        # If they exceed the limit, truncate them proportionally
-        claim_tokens = claim_tokens[:half_tokens]
-        evidence_tokens = evidence_tokens[: max_length - len(claim_tokens)]
-
-    # Reconstruct the input text
-    truncated_claim = tokenizer.convert_tokens_to_string(claim_tokens)
-    truncated_evidence = tokenizer.convert_tokens_to_string(evidence_tokens)
-
-    input_text = f"{truncated_claim} [SEP] {truncated_evidence}"
-
-    result = pipe(input_text)
-
-    # The pipeline usually returns a list of dicts, we take the first one
-    return result[0]["label"]
-
-
-def stance_detection(evidence_docs, claim):
-    results = {}
-
-    for i, evidence in enumerate(evidence_docs):
-
-        stance = process_evidence(claim, evidence.page_content)
-        logging.info(f"evidence {i}, label: {stance}")
-        results[str(i)] = stance
-
-    return results
+    map_chain = RunnableParallel(**chains_dict)
+    labels = map_chain.invoke({"claim": claim})
+    # labels = clean_and_match(labels)
+    return labels
 
 
 def merge_answer(model, evidence_docs, labels, claim):
