@@ -44,18 +44,18 @@ def stance_detection(model, evidence_docs, claim):
 def merge_answer(model, evidence_docs, labels, claim):
     llm = get_llm(model)
 
-    # Identify 'refutes' and 'supports' labels
+    # Identify 'refutes' and 'support' labels
     refutes_keys = [
         int(key) for key in labels if labels[key]["stance"].lower() == "refutes"
     ]
-    supports_keys = [
-        int(key) for key in labels if labels[key]["stance"].lower() == "supports"
+    support_keys = [
+        int(key) for key in labels if labels[key]["stance"].lower() == "support"
     ]
 
     # Determine the stance and relevant keys
-    if supports_keys:
-        stance = "supports"
-        relevant_keys = supports_keys
+    if support_keys:
+        stance = "support"
+        relevant_keys = support_keys
     elif refutes_keys:
         stance = "refutes"
         relevant_keys = refutes_keys
@@ -79,4 +79,4 @@ def merge_answer(model, evidence_docs, labels, claim):
     # Extract source URLs from the metadata of each document in the evidence
     source = "\n".join({doc.metadata["url"] for doc in evidence.values()})
 
-    return answer, source
+    return stance, answer, source

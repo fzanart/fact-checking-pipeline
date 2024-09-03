@@ -1,5 +1,6 @@
+"""Module for fetching, parsing, and retrieving web content using LangChain and Chroma."""
+
 import os
-import subprocess
 import html2text
 from langchain_chroma import Chroma
 from langchain.docstore.document import Document

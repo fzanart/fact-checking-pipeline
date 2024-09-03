@@ -1,3 +1,5 @@
+"""Module for performing keyword searches and retrieving URLs."""
+
 import re
 from .aux import get_llm
 from .prompts import (
