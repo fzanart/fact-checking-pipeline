@@ -91,7 +91,7 @@ Website content:  {context}\n
 
 template_merge = """
 You are a website scraper and you have just scraped the following content from a website.
-You are now asked to answer how the content you have scraped refutes the claim below.
+You are now asked to answer how the content you have scraped {stance} the claim below.
 You have scraped many chunks since the website is large and now you are asked to merge them into a single answer without repetitions (if there are any).\n
 Ignore any text that appears to be user comments and focus only on the main content provided by the website.
 Output instructions: Provide a factual response to the original claim in simple text, without adding any formatting or additional elements to the text (e.g., "Response:"). 
