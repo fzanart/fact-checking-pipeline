@@ -43,7 +43,28 @@ def keyword_search_result(statement, model, prompt_template):
 def get_urls(keywords):
 
     search = DuckDuckGoSearchResults()
-    results = search.run(keywords)
+
+    white_list = [
+        "climate.gov",
+        "climate.nasa.gov",
+        "climatechangeinaustralia.gov.au",
+        "climatefeedback.org",
+        "globalchange.gov",
+        "ipcc.ch",
+        "nationalacademies.org",
+        "news.climate.columbia.edu",
+        "noaa.gov",
+        "nsidc.org",
+        "realclimate.org",
+        "royalsociety.org",
+        "skepticalscience.com",
+        "unfccc.int",
+        "wmo.int",
+    ]
+
+    search_query = keywords + " " + " OR ".join(["site:" + site for site in white_list])
+
+    results = search.run(search_query)
     urls = re.findall(r"link: ([^\]]+)", results)
 
     return urls
