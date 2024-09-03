@@ -1,3 +1,5 @@
+"""Auxiliary functions and configurations for LLM interactions."""
+
 import os
 import re
 import json
