@@ -75,7 +75,7 @@ def clean_and_match(data):
         except AttributeError:
             content = value
 
-        cleaned_value = clean_pattern.sub("", content)
+        cleaned_value = clean_pattern.sub("", content).replace("nostance", "no stance")
         # Match the stance
         match = stance_pattern.search(cleaned_value)
         if match:

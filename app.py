@@ -56,14 +56,14 @@ def fact_checking_pipeline(claim):
 
     else:
         factual_response = {
-            "answer": answer,
+            "answer": content,
             "keywords": keywords,
             "source": "NA",
             "stance": "Unknown",
         }
 
     debunker = Debunker(model)
-    rebuttal = debunker.rebuttal_generator(claim, factual_response)
+    rebuttal = debunker.rebuttal_generator(claim, factual_response["answer"])
 
     factual_response["rebuttal"] = rebuttal
 
