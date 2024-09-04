@@ -63,7 +63,7 @@ def clean_and_match(data):
     clean_pattern = re.compile(r"```|\bjson\b|\n|\s+", re.IGNORECASE)
     # Define the stance matching pattern
     stance_pattern = re.compile(
-        r'{"stance":\s*["\'](no stance|refutes|supports)["\']}',
+        r'{"stance":\s*["\'](no stance|refutes|support)["\']}',
         re.IGNORECASE | re.DOTALL,
     )
 
