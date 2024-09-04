@@ -50,13 +50,13 @@ class Debunker:
         chain = prompt | self.llm
         return chain.invoke(
             {"claim": claim, "factual_information": factual_information}
-        )
+        ).content
 
     def generate_nd_layer(self, claim):
         ## MYTH: Summ
         prompt = SUMMARIZATION
         chain = prompt | self.llm
-        return chain.invoke({"text": claim})
+        return chain.invoke({"text": claim}).content
 
     def generate_rd_layer(self, claim):
         ## FALLACY: Fallacy
@@ -98,7 +98,7 @@ class Debunker:
             }
         ).content
 
-        content = re.sub(r"Response:", "", content)
+        # content = re.sub(r"Response:", "", content)
 
         return content
 
@@ -128,7 +128,7 @@ class Debunker:
 
         chain = prompt | self.llm
 
-        return chain.invoke(prompt_completition)
+        return chain.invoke(prompt_completition).content
 
     def rebuttal_generator(self, claim, factual_information):
 
