@@ -1,7 +1,8 @@
 """Fact-checking pipeline and Gradio interface for claim verification."""
 
 import logging
-import json
+
+# import json
 from src.fact_check.search import keyword_search_result, get_urls
 from src.fact_check.retrieve import (
     fetch_url_and_parse_html,
@@ -33,9 +34,9 @@ def fact_checking_pipeline(claim):
 
     # 3. Stance Detection:
     labels = stance_detection(model, evidence_docs, claim)
-    logging.info("labels = %s", json.dumps(labels, indent=4))
+    logging.info("labels = %s", labels)
     lbls = clean_and_match(labels)
-    logging.info("lbls = %s", json.dumps(lbls, indent=4))
+    logging.info("lbls = %s", lbls)
 
     # 4. Claim Validation:
     answer = merge_answer(model, evidence_docs, lbls, claim)
