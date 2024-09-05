@@ -12,6 +12,7 @@ from src.fact_check.retrieve import (
 from src.fact_check.process import stance_detection, merge_answer
 from src.fact_check.aux import clean_and_match
 from src.debunker.core import Debunker
+from src.zero_shot.zero_shot import zero_shot_rebuttal
 import gradio as gr
 
 logging.basicConfig(format="%(message)s", level=logging.INFO)
@@ -20,6 +21,7 @@ logging.basicConfig(format="%(message)s", level=logging.INFO)
 def fact_checking_pipeline(claim):
 
     model, keyword_template = "openai", "cot"
+    debunker = Debunker(model)
     logging.info("claim = %s", claim)
 
     # 1. Web documents retrieval:
@@ -67,9 +69,18 @@ def fact_checking_pipeline(claim):
 
     if factual_response["stance"] == "refutes":
         # if refutes, then generate rebuttal
-        debunker = Debunker(model)
         rebuttal = debunker.rebuttal_generator(claim, factual_response["answer"])
         factual_response["rebuttal"] = rebuttal
+
+    # Add CARDS prediction
+    card_prediction = debunker.endpoint_query(model=debunker.card_model, payload=claim)[
+        0
+    ][0].get("label")
+    factual_response["card_prediction"] = card_prediction
+
+    # Add Zero-shot rebuttal
+    zs_rebuttal = zero_shot_rebuttal(claim, model)
+    factual_response["zero_shot_rebuttal"] = zs_rebuttal
 
     return str(factual_response)
 
