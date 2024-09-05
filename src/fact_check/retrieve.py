@@ -5,7 +5,7 @@ import html2text
 from langchain_chroma import Chroma
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import AsyncChromiumLoader
-from langchain_community.embeddings import HuggingFaceBgeEmbeddings
+from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
 
 
 # Fetch
@@ -45,13 +45,13 @@ def parse_html(document):
 
 
 # Split
-def split_into_chunked_docs(documents, chunk_size=1024):
+def split_into_chunked_docs(documents, chunk_size=512):
     if not isinstance(documents, list):
         documents = [documents]
 
     # Initialize a text splitter
     text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
-        chunk_size=chunk_size, chunk_overlap=128
+        chunk_size=chunk_size, chunk_overlap=0
     )
     # Split the text content
     chunked_docs = text_splitter.split_documents(documents)
@@ -60,12 +60,12 @@ def split_into_chunked_docs(documents, chunk_size=1024):
 
 
 # RAG
-def retrieve_docs(chunked_docs, keywords, model_name="BAAI/bge-m3"):
-
-    embeddings = HuggingFaceBgeEmbeddings(
+def retrieve_docs(
+    chunked_docs, keywords, model_name="sentence-transformers/all-MiniLM-l6-v2"
+):
+    embeddings = HuggingFaceInferenceAPIEmbeddings(
+        api_key=os.environ.get("HF_API_KEY"),
         model_name=model_name,
-        model_kwargs={"device": "cuda"},
-        encode_kwargs={"normalize_embeddings": True},
     )
 
     vectorstore = Chroma.from_documents(
