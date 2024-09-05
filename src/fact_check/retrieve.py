@@ -3,7 +3,6 @@
 import os
 import html2text
 from langchain_chroma import Chroma
-from langchain.docstore.document import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import AsyncChromiumLoader
 from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
