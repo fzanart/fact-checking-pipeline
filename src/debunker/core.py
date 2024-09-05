@@ -42,7 +42,9 @@ class Debunker:
         self.taxonomy_cards = "crarojasca/TaxonomyAugmentedCARDS"
 
         self.dirname = os.path.dirname(os.path.abspath("__file__"))
-        self.filename = os.path.join(self.dirname, "debunker/climate_fever_cards.csv")
+        self.filename = os.path.join(
+            self.dirname, "src/debunker/climate_fever_cards.csv"
+        )
 
     def generate_st_layer(self, claim, factual_information):
         # generate fact layer from fact_check input
