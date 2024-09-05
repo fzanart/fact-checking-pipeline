@@ -42,6 +42,7 @@ def fact_checking_pipeline(claim):
     answer = merge_answer(model, evidence_docs, lbls, claim)
 
     if isinstance(answer, tuple):
+        # if tuple means the pipeline found supporting/refuting evidence
         try:
             content = answer[1].content
         except AttributeError:
@@ -55,6 +56,7 @@ def fact_checking_pipeline(claim):
         }
 
     else:
+        # "No supporting or refuting evidence has been found"
         content = answer
         factual_response = {
             "answer": content,
@@ -63,10 +65,11 @@ def fact_checking_pipeline(claim):
             "stance": "Unknown",
         }
 
-    debunker = Debunker(model)
-    rebuttal = debunker.rebuttal_generator(claim, factual_response[])
-
-    factual_response["rebuttal"] = rebuttal
+    if factual_response["stance"] == "refutes":
+        # if refutes, then generate rebuttal
+        debunker = Debunker(model)
+        rebuttal = debunker.rebuttal_generator(claim, factual_response["answer"])
+        factual_response["rebuttal"] = rebuttal
 
     return str(factual_response)
 
