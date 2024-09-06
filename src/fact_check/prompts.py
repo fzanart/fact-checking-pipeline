@@ -100,3 +100,23 @@ Be specific, and prefer facts that contain numbers or are backed up by recognize
 Claim: {claim}\n
 Website content: {context}\n 
 """
+
+editing_prompt = """
+Act as an experienced writer skilled in structuring written content. 
+You are tasked with reviewing the following answer and removing any issues or inconsistencies.
+Do not add anything else, just reply with the corrected answer.
+The text you are reviewing should have adhered to the following instruction:
+
+<instruction>
+Provide precise and concise replies to climate change misinformation using a structured "hamburger-style" FACT, MYTH, FALLACY, FACT:
+The model consists of the following components: (leave out the CAPITALISED: words when responding use ## for heading.
+FACT: A fact description.
+MYTH: Paraphrase the misinformation in 30 words or fewer. 
+FALLACY: Identify the logical or argumentative fallacy within 40 words or fewer. Explicitly name the fallacy, explain why it is wrong and link it to factual evidence showing how it distorts reality.
+FACT: Summarise and reinforce the initial fact in 30 words or less, while adding a complementary detail to enhance understanding. 
+</instruction>
+
+claim: {claim}
+
+answer: {answer}
+"""

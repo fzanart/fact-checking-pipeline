@@ -10,6 +10,7 @@ from langchain_google_genai import GoogleGenerativeAI
 from langchain_core.pydantic_v1 import BaseModel, Field
 from langchain_core.output_parsers import JsonOutputParser
 from google.generativeai.types.safety_types import HarmBlockThreshold, HarmCategory
+from .src.fact_check.prompts import editing_prompt
 
 MODEL_CONFIG = {
     "openai": ChatOpenAI(
@@ -82,3 +83,30 @@ def clean_and_match(data):
             matches[key] = json.loads(match.group())
 
     return matches
+
+
+def ensemble_classifier(fcp_label, cards_label):
+    """
+    Combines predictions from Fact Checking Pipeline (FCP) and CARDS
+    """
+    # Define possible combinations and their corresponding label
+    rules = {
+        ("unknown", "not contrarian"): "fact",
+        ("unknown", "contrarian"): "myth",
+        ("support", "not contrarian"): "fact",
+        ("support", "contrarian"): "myth",
+        ("refutes", "not contrarian"): "fact",
+        ("refutes", "contrarian"): "myth",
+    }
+    # Return the corresponding label
+    return rules.get((fcp_label.lower(), cards_label.lower()))
+
+
+def editing_chain(answer):
+    """
+    Edit the answer to remove glitches
+    """
+    prompt = editing_prompt
+    chain = prompt | get_llm("openai")
+
+    return chain.invoke({"answer": answer}).content

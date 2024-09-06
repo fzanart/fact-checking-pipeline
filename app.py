@@ -10,9 +10,10 @@ from src.fact_check.retrieve import (
     retrieve_docs,
 )
 from src.fact_check.process import stance_detection, merge_answer
-from src.fact_check.aux import clean_and_match
+from src.fact_check.aux import clean_and_match, ensemble_classifier, editing_chain
 from src.debunker.core import Debunker
 from src.zero_shot.zero_shot import zero_shot_rebuttal
+
 import gradio as gr
 
 logging.basicConfig(format="%(message)s", level=logging.INFO)
@@ -64,23 +65,31 @@ def fact_checking_pipeline(claim):
             "answer": content,
             "keywords": keywords,
             "source": "NA",
-            "stance": "Unknown",
+            "stance": "unknown",
         }
 
-    if factual_response["stance"] == "refutes":
-        # if refutes, then generate rebuttal
+    # CARDS prediction
+    cards_prediction = debunker.endpoint_query(
+        model=debunker.card_model, payload=claim
+    )[0][0].get("label")
+    factual_response["cards_prediction"] = cards_prediction
+
+    # Ensemble classifier
+    ensemble_prediction = ensemble_classifier(
+        factual_response["stance"], cards_prediction
+    )
+    factual_response["ensemble_prediction"] = ensemble_prediction
+
+    if ensemble_prediction == "myth":
+        # generate rebuttals
         rebuttal = debunker.rebuttal_generator(claim, factual_response["answer"])
         factual_response["rebuttal"] = rebuttal
-
-    # Add CARDS prediction
-    card_prediction = debunker.endpoint_query(model=debunker.card_model, payload=claim)[
-        0
-    ][0].get("label")
-    factual_response["card_prediction"] = card_prediction
-
-    # Add Zero-shot rebuttal
-    zs_rebuttal = zero_shot_rebuttal(claim, model)
-    factual_response["zero_shot_rebuttal"] = zs_rebuttal
+        # TODO: add final review to remove glitches
+        # edited_rebuttal = editing_chain(rebuttal)
+        # factual_response["edited_rebuttal"] = edited_rebuttal
+        # Add Zero-shot rebuttal
+        zs_rebuttal = zero_shot_rebuttal(claim, model)
+        factual_response["zero_shot_rebuttal"] = zs_rebuttal
 
     return str(factual_response)
 

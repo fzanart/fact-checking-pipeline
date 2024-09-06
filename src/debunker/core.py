@@ -12,6 +12,7 @@ from collections import namedtuple
 import requests
 from .templates import (
     FACTUAL_RESPONSE,
+    UNKNOWN_FACT,
     INCONTEXT,
     SUMMARIZATION,
     CONCLUDING,
@@ -30,9 +31,9 @@ class Debunker:
         self.heading = namedtuple("Heading", ["name", "content"])
         self.hamburger = [
             self.heading(name="Myth", content=None),
-            self.heading(name="##FACT", content=None),
-            self.heading(name="##MYTH", content=None),
-            self.heading(name="##FALLACY", content=None),
+            self.heading(name="## FACT", content=None),
+            self.heading(name="## MYTH", content=None),
+            self.heading(name="## FALLACY", content=None),
             self.heading(name="##FACT", content=None),
         ]
         self.llm = get_llm(model)
@@ -48,7 +49,10 @@ class Debunker:
 
     def generate_st_layer(self, claim, factual_information):
         # generate fact layer from fact_check input
-        prompt = FACTUAL_RESPONSE
+        if factual_information == "No supporting or refuting evidence has been found":
+            prompt = UNKNOWN_FACT
+        else:
+            prompt = FACTUAL_RESPONSE
         chain = prompt | self.llm
         return chain.invoke(
             {"claim": claim, "factual_information": factual_information}
@@ -100,7 +104,7 @@ class Debunker:
             }
         ).content
 
-        # content = re.sub(r"Response:", "", content)
+        content = re.sub(r"Response:", "", content)
 
         return content
 
