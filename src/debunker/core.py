@@ -91,9 +91,7 @@ class Debunker:
         ]  # get only the fallacy layer from the example.
         fact = fact.replace("## FALLACY:", "")
 
-        prompt = INCONTEXT
-        chain = prompt | self.llm
-        content = chain.invoke(
+        prompt = INCONTEXT.invoke(
             {
                 "misinformation": claim,
                 "detected_fallacy": detected_fallacy,
@@ -102,7 +100,9 @@ class Debunker:
                 "example_myth": example_myth,
                 "factual_information": self.hamburger[1].content,
             }
-        ).content
+        )
+        chain = prompt | self.llm
+        content = chain.invoke().content
 
         content = re.sub(r"Response:", "", content)
 
