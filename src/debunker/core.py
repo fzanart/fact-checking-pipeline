@@ -21,6 +21,7 @@ from .templates import (
 from .definitions import DEFINITIONS
 from .examples import FALLACY_CLAIMS, DEBUNKINGS
 from ..fact_check.aux import get_llm
+from langchain_core.prompts import ChatPromptTemplate
 
 os.environ["HUGGINGFACEHUB_API_TOKEN"] = os.environ.get("HF_API_KEY")
 
@@ -91,7 +92,7 @@ class Debunker:
         ]  # get only the fallacy layer from the example.
         fact = fact.replace("## FALLACY:", "")
 
-        prompt = INCONTEXT.invoke(
+        prompt = ChatPromptTemplate(INCONTEXT).invoke(
             {
                 "misinformation": claim,
                 "detected_fallacy": detected_fallacy,

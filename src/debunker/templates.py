@@ -20,33 +20,31 @@ misinformation: {claim}
 response: """
 )
 
-INCONTEXT = ChatPromptTemplate(
-    [
-        (
-            "system",
-            "You are a senior climate analyst, an expert in identifying and responding to climate change misinformation.",
-        ),
-        (
-            "human",
-            "What fallacy is contained in the following climate change misinformation?\nmisinformation: {misinformation}",
-        ),
-        (
-            "ai",
-            "Your text contains {detected_fallacy} fallacy. {detected_fallacy} fallacy is {fallacy_definition}",
-        ),
-        (
-            "human",
-            "What is the factual evidence surrounding this climate change misinformation?",
-        ),
-        ("ai", "{factual_information}"),
-        (
-            "human",
-            "Provide a precise and concise response to this climate change misinformation. In two sentences, explicitly name the fallacy, explain why it's incorrect, and link it to factual evidence showing how it distorts reality. Consider the following example before providing your answer: Misinformation: {example_myth}",
-        ),
-        ("ai, Response: {example_response}"),
-        ("human", "Misinformation: {misinformation}"),
-    ]
-)
+INCONTEXT = [
+    (
+        "system",
+        "You are a senior climate analyst, an expert in identifying and responding to climate change misinformation.",
+    ),
+    (
+        "human",
+        "What fallacy is contained in the following climate change misinformation?\nmisinformation: {misinformation}",
+    ),
+    (
+        "ai",
+        "Your text contains {detected_fallacy} fallacy. {detected_fallacy} fallacy is {fallacy_definition}",
+    ),
+    (
+        "human",
+        "What is the factual evidence surrounding this climate change misinformation?",
+    ),
+    ("ai", "{factual_information}"),
+    (
+        "human",
+        "Provide a precise and concise response to this climate change misinformation. In two sentences, explicitly name the fallacy, explain why it's incorrect, and link it to factual evidence showing how it distorts reality. Consider the following example before providing your answer: Misinformation: {example_myth}",
+    ),
+    ("ai, Response: {example_response}"),
+    ("human", "Misinformation: {misinformation}"),
+]
 
 SUMMARIZATION = PromptTemplate.from_template(
     """[INST]
