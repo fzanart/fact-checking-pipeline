@@ -10,7 +10,7 @@ from langchain_google_genai import GoogleGenerativeAI
 from langchain_core.pydantic_v1 import BaseModel, Field
 from langchain_core.output_parsers import JsonOutputParser
 from google.generativeai.types.safety_types import HarmBlockThreshold, HarmCategory
-from .src.fact_check.prompts import editing_prompt
+from .prompts import editing_prompt
 
 MODEL_CONFIG = {
     "openai": ChatOpenAI(
