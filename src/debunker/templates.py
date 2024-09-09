@@ -21,29 +21,29 @@ response: """
 )
 
 INCONTEXT = [
-    (
-        "system",
-        "You are a senior climate analyst, an expert in identifying and responding to climate change misinformation.",
-    ),
-    (
-        "human",
-        "What fallacy is contained in the following climate change misinformation?\nmisinformation: {misinformation}",
-    ),
-    (
-        "ai",
-        "Your text contains {detected_fallacy} fallacy. {detected_fallacy} fallacy is {fallacy_definition}",
-    ),
-    (
-        "human",
-        "What is the factual evidence surrounding this climate change misinformation?",
-    ),
-    ("ai", "{factual_information}"),
-    (
-        "human",
-        "Provide a precise and concise response to this climate change misinformation. In two sentences, explicitly name the fallacy, explain why it's incorrect, and link it to factual evidence showing how it distorts reality. Consider the following example before providing your answer: Misinformation: {example_myth}",
-    ),
-    ("ai, Response: {example_response}"),
-    ("human", "Misinformation: {misinformation}"),
+    {
+        "role": "system",
+        "content": "You are a senior climate analyst, an expert in identifying and responding to climate change misinformation.",
+    },
+    {
+        "role": "user",
+        "content": "What fallacy is contained in the following climate change misinformation?\nmisinformation: {misinformation}",
+    },
+    {
+        "role": "assistant",
+        "content": "Your text contains {detected_fallacy} fallacy. {detected_fallacy} fallacy is {fallacy_definition}",
+    },
+    {
+        "role": "user",
+        "content": "What is the factual evidence surrounding this climate change misinformation?",
+    },
+    {"role": "assistant", "content": "{factual_information}"},
+    {
+        "role": "user",
+        "content": "Provide a precise and concise response to this climate change misinformation. In two sentences, explicitly name the fallacy, explain why it's incorrect, and link it to factual evidence showing how it distorts reality. Consider the following example before providing your answer: Misinformation: {example_myth}",
+    },
+    {"role": "assistant", "content": "Response: {example_response}"},
+    {"role": "user", "content": "Misinformation: {misinformation}"},
 ]
 
 SUMMARIZATION = PromptTemplate.from_template(

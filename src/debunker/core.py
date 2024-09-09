@@ -10,7 +10,6 @@ import csv
 from ast import literal_eval
 from collections import namedtuple
 import requests
-from langchain_core.prompts import ChatPromptTemplate
 from .templates import (
     FACTUAL_RESPONSE,
     UNKNOWN_FACT,
@@ -24,7 +23,6 @@ from .examples import FALLACY_CLAIMS, DEBUNKINGS
 from ..fact_check.aux import get_llm
 
 os.environ["HUGGINGFACEHUB_API_TOKEN"] = os.environ.get("HF_API_KEY")
-incontext_prompt = ChatPromptTemplate(INCONTEXT)
 
 
 class Debunker:
@@ -93,17 +91,22 @@ class Debunker:
         ]  # get only the fallacy layer from the example.
         fact = fact.replace("## FALLACY:", "")
 
-        chain = incontext_prompt | self.llm
-        content = chain.invoke(
+        incontext_prompt = [
             {
-                "misinformation": claim,
-                "detected_fallacy": detected_fallacy,
-                "fallacy_definition": fallacy_definition,
-                "example_response": fact,
-                "example_myth": example_myth,
-                "factual_information": self.hamburger[1].content,
+                "role": message["role"],
+                "content": message["content"].format(
+                    misinformation=claim,
+                    detected_fallacy=detected_fallacy,
+                    fallacy_definition=fallacy_definition,
+                    example_response=example_response,
+                    example_myth=example_myth,
+                    factual_information=self.hamburger[1].content,
+                ),
             }
-        ).content
+            for message in INCONTEXT
+        ]
+
+        content = self.llm.invoke(incontext_prompt).content
 
         content = re.sub(r"Response:", "", content)
 
