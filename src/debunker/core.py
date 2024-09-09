@@ -47,6 +47,7 @@ class Debunker:
         self.filename = os.path.join(
             self.dirname, "src/debunker/climate_fever_cards.csv"
         )
+        self.incontext_prompt = INCONTEXT
 
     def generate_st_layer(self, claim, factual_information):
         # generate fact layer from fact_check input
@@ -92,7 +93,7 @@ class Debunker:
         ]  # get only the fallacy layer from the example.
         fact = fact.replace("## FALLACY:", "")
 
-        prompt = ChatPromptTemplate(INCONTEXT)
+        prompt = ChatPromptTemplate(self.incontext_prompt)
         chain = prompt | self.llm
         content = chain.invoke(
             {
