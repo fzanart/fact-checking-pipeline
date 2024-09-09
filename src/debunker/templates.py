@@ -3,7 +3,6 @@ Contains prompt templates to be used on app.py
 """
 
 from langchain.prompts import PromptTemplate
-from langchain_core.prompts import ChatPromptTemplate
 
 FACTUAL_RESPONSE = PromptTemplate.from_template(
     """Based on the provided claim and factual information, generate a factual response in two sentences (or fewer than 30 words). 

@@ -37,7 +37,6 @@ def fact_checking_pipeline(claim):
 
     # 3. Stance Detection:
     labels = stance_detection(model, evidence_docs, claim)
-    logging.info("labels = %s", labels)
     lbls = clean_and_match(labels)
     logging.info("lbls = %s", lbls)
 

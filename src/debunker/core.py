@@ -7,6 +7,7 @@ import re
 import time
 import json
 import csv
+import logging
 from ast import literal_eval
 from collections import namedtuple
 import requests
@@ -22,6 +23,7 @@ from .definitions import DEFINITIONS
 from .examples import FALLACY_CLAIMS, DEBUNKINGS
 from ..fact_check.aux import get_llm
 
+logging.basicConfig(format="%(message)s", level=logging.INFO)
 os.environ["HUGGINGFACEHUB_API_TOKEN"] = os.environ.get("HF_API_KEY")
 
 
@@ -34,7 +36,7 @@ class Debunker:
             self.heading(name="## FACT", content=None),
             self.heading(name="## MYTH", content=None),
             self.heading(name="## FALLACY", content=None),
-            self.heading(name="##FACT", content=None),
+            self.heading(name="## FACT", content=None),
         ]
         self.llm = get_llm(model)
         self.flicc_model = "fzanartu/flicc"
@@ -148,19 +150,22 @@ class Debunker:
         self.hamburger[1] = self.hamburger[1]._replace(
             content=self.generate_st_layer(claim, factual_information).strip()
         )
+        logging.info("## FACT: %s", self.hamburger[1].content)
         ## MYTH
         self.hamburger[2] = self.hamburger[2]._replace(
             content=self.generate_nd_layer(claim).strip()
         )
+        logging.info("## MYTH: %s", self.hamburger[2].content)
         ## FALLACY
         self.hamburger[3] = self.hamburger[3]._replace(
             content=self.generate_rd_layer(claim).strip()
         )
+        logging.info(f"## FALLACY: {self.hamburger[3].content}")
         ## FACT
         self.hamburger[4] = self.hamburger[4]._replace(
             content=self.generate_th_layer(claim).strip()
         )
-
+        logging.info("## FACT: %s", self.hamburger[4].content)
         # compose and format the string
         rebuttal = f"{self.hamburger[1].name}: {self.hamburger[1].content}\n"
         rebuttal += f"{self.hamburger[2].name}: {self.hamburger[2].content}\n"
