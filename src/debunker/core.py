@@ -100,7 +100,7 @@ class Debunker:
                     misinformation=claim,
                     detected_fallacy=detected_fallacy,
                     fallacy_definition=fallacy_definition,
-                    example_response=example_response,
+                    example_response=fact,
                     example_myth=example_myth,
                     factual_information=self.hamburger[1].content,
                 ),
