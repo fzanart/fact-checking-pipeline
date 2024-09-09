@@ -83,6 +83,7 @@ def fact_checking_pipeline(claim):
         # generate rebuttals
         rebuttal = debunker.rebuttal_generator(claim, factual_response["answer"])
         factual_response["rebuttal"] = rebuttal
+        factual_response["detected_fallacy"] = debunker.detected_fallacy
         # TODO: add final review to remove glitches
         # edited_rebuttal = editing_chain(rebuttal)
         # factual_response["edited_rebuttal"] = edited_rebuttal

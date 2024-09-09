@@ -48,6 +48,7 @@ class Debunker:
         self.filename = os.path.join(
             self.dirname, "src/debunker/climate_fever_cards.csv"
         )
+        self.detected_fallacy = None
 
     def generate_st_layer(self, claim, factual_information):
         # generate fact layer from fact_check input
@@ -70,13 +71,13 @@ class Debunker:
         ## FALLACY: Fallacy
 
         # 1 predict fallacy label in FLICC taxonomy
-        detected_fallacy = self.endpoint_query(model=self.flicc_model, payload=claim)[
-            0
-        ][0].get("label")
-        fallacy_definition = DEFINITIONS.get(detected_fallacy)
+        self.detected_fallacy = self.endpoint_query(
+            model=self.flicc_model, payload=claim
+        )[0][0].get("label")
+        fallacy_definition = DEFINITIONS.get(self.detected_fallacy)
 
         # 2 get all examples with the same label
-        claims = FALLACY_CLAIMS.get(detected_fallacy, None)
+        claims = FALLACY_CLAIMS.get(self.detected_fallacy, None)
 
         # 3 get cosine similarity for all claims and myth
         example_myths = self.endpoint_query(
@@ -98,7 +99,7 @@ class Debunker:
                 "role": message["role"],
                 "content": message["content"].format(
                     misinformation=claim,
-                    detected_fallacy=detected_fallacy,
+                    detected_fallacy=self.detected_fallacy,
                     fallacy_definition=fallacy_definition,
                     example_response=fact,
                     example_myth=example_myth,
