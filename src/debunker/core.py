@@ -24,6 +24,7 @@ from .examples import FALLACY_CLAIMS, DEBUNKINGS
 from ..fact_check.aux import get_llm
 
 os.environ["HUGGINGFACEHUB_API_TOKEN"] = os.environ.get("HF_API_KEY")
+incontext_prompt = ChatPromptTemplate(INCONTEXT)
 
 
 class Debunker:
@@ -47,7 +48,6 @@ class Debunker:
         self.filename = os.path.join(
             self.dirname, "src/debunker/climate_fever_cards.csv"
         )
-        self.incontext_prompt = INCONTEXT
 
     def generate_st_layer(self, claim, factual_information):
         # generate fact layer from fact_check input
@@ -93,8 +93,7 @@ class Debunker:
         ]  # get only the fallacy layer from the example.
         fact = fact.replace("## FALLACY:", "")
 
-        prompt = ChatPromptTemplate(self.incontext_prompt)
-        chain = prompt | self.llm
+        chain = incontext_prompt | self.llm
         content = chain.invoke(
             {
                 "misinformation": claim,
