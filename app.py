@@ -1,4 +1,4 @@
-"""Fact-checking pipeline and Gradio interface for claim verification."""
+"""Fact-checking pipeline and Gradio interface for claim verification. """
 
 import logging
 
