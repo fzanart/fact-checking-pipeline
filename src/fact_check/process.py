@@ -3,7 +3,7 @@
 import logging
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnableParallel
-from langchain.callbacks.tracers import ConsoleCallbackHandler
+from langchain.chains import LLMChain
 from .aux import parser, get_llm
 from .prompts import stance_detection_template, template_merge
 
@@ -74,11 +74,8 @@ def merge_answer(model, evidence_docs, labels, claim):
         template=template_merge, input_variables=["stance", "context", "claim"]
     )
 
-    merge_chain = merge_prompt | llm
-    answer = merge_chain.invoke(
-        {"stance": stance, "context": evidence, "claim": claim},
-        config={"callbacks": [ConsoleCallbackHandler()]},
-    )
+    merge_chain = LLMChain(llm=llm, prompt=merge_prompt, verbose=True)
+    answer = merge_chain.invoke({"stance": stance, "context": evidence, "claim": claim})
 
     # Extract source URLs from the metadata of each document in the evidence
     source = "\n".join({doc.metadata["url"] for doc in evidence.values()})
