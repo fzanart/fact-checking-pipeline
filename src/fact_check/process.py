@@ -74,7 +74,9 @@ def merge_answer(model, evidence_docs, labels, claim):
     )
 
     merge_chain = merge_prompt | llm
-    answer = merge_chain.invoke({"stance": stance, "context": evidence, "claim": claim})
+    answer = merge_chain.invoke(
+        {"stance": stance, "context": evidence, "claim": claim}, verbose=True
+    )
 
     # Extract source URLs from the metadata of each document in the evidence
     source = "\n".join({doc.metadata["url"] for doc in evidence.values()})

@@ -27,18 +27,20 @@ def fact_checking_pipeline(claim):
 
     # 1. Web documents retrieval:
     keywords = keyword_search_result(claim, model, keyword_template)
-    logging.info("keywords = %s", keywords)
+    logging.info("1. keywords = %s", keywords)
     urls = get_urls(keywords)
+    logging.info("2. urls = %s", urls)
     html = fetch_url_and_parse_html(urls)
     chunked_docs = split_into_chunked_docs(html)
 
     # 2. Evidence Extraction:
     evidence_docs = retrieve_docs(chunked_docs, keywords)
+    logging.info("3. evidence_docs = %s", evidence_docs)
 
     # 3. Stance Detection:
     labels = stance_detection(model, evidence_docs, claim)
     lbls = clean_and_match(labels)
-    logging.info("lbls = %s", lbls)
+    logging.info("4. lbls = %s", lbls)
 
     # 4. Claim Validation:
     answer = merge_answer(model, evidence_docs, lbls, claim)
